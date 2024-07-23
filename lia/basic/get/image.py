@@ -7,6 +7,7 @@ import cv2
 LEAF_COLOR_FORMAT = "HSV"
 LEAF_COLOR_LOWER = (30, 50, 50)
 LEAF_COLOR_UPPER = (90, 255, 200)
+WHITE_INV_THRESH = 230
 
 
 def get_image_in_color_range(
@@ -45,3 +46,23 @@ def get_image_in_color_range(
             f'Invalid color format: {color_format}\nPlease select "RGB" or "HSV".'
         )
     return mask
+
+
+def get_white_bg_binary_img(img, thresh=WHITE_INV_THRESH):
+    """Get binary iamge from white background image.
+
+    Parameters
+    ----------
+    img : numpy.ndarray
+        Input white background image.
+    thresh : int
+        Threshold of white background.
+
+    Returns
+    -------
+    binary_img : numpy.ndarray
+        Binary image.
+    """
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, binary_img = cv2.threshold(img_gray, thresh, 255, cv2.THRESH_BINARY_INV)
+    return binary_img
