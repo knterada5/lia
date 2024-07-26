@@ -1,0 +1,1 @@
+MIN_CNTS_RATIO = 100

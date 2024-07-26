@@ -1,17 +1,20 @@
 import flet as ft
 
 from lia.data.color_fvfm import ColorFvFmData
-from lia.gui.base.content_tab import ContentTab
+from lia.gui.base.run_tab import RunTab
 
 AUTO_TITLE = "Auto"
 
 
-class AutoTab(ContentTab):
+class AutoTab(RunTab):
     def __init__(self, data: ColorFvFmData):
         super().__init__()
         self.data = data
         self.text = AUTO_TITLE
-        self.set_content()
+        self.set_contents()
 
-    def set_content(self):
-        self.content = ft.Text(AUTO_TITLE)
+    def set_contents(self):
+        pass
+
+    def reload(self):
+        pass

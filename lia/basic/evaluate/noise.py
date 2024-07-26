@@ -16,12 +16,12 @@ def get_noise(
     ----------
     img : numpy.ndarray
         Input gray scale image.
-    canny_thr1 : int (defautl: 100)
+    canny_thr1 : int
         Canny threshold 1.
-    canny_thr2 : int (default: 200)
+    canny_thr2 : int
         Canny threshold 2.
-    min_noise : int (default: 100)
-        Minimum noise ratio (min_noise_area = area / min_noise).
+    noise_thresh : int
+        Threshold of noise.
 
     Returns
     -------

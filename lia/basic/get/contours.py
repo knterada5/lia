@@ -1,5 +1,7 @@
 """Get contours."""
 
+from multiprocessing import Pool
+
 import cv2
 import numpy as np
 
@@ -10,10 +12,11 @@ from lia.basic.evaluate.noise import (
     get_noise,
 )
 
-MIN_CNTS_RATIO = 100
+from ._consts import MIN_CNTS_RATIO
+
 THRESH = 60
 BLANK_RATIO = 98
-NOISE_RATIO_THRESH = 50
+NUM_NOISE_THRESH = 50
 WHITE_BG_THRESH = 30
 
 
@@ -43,7 +46,7 @@ def get_cnts_from_hsv(
     img,
     thresh=THRESH,
     blank_ratio=BLANK_RATIO,
-    noise_ratio_thresh=NOISE_RATIO_THRESH,
+    noise_ratio_thresh=NUM_NOISE_THRESH,
     min_cnts_ratio=MIN_CNTS_RATIO,
     canny_thresh1=CANNY_THRESH1,
     canny_thresh2=CANNY_THRESH2,
@@ -70,32 +73,120 @@ def get_cnts_from_hsv(
     ValueError
         If no contours were detected.
     """
-    height, width = img.shape[:2]
-    area = height * width
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     hsv = cv2.split(img_hsv)
-    noise_list = []
+    image_list = []
     for image in hsv:
-        _, img_bin = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)
-        white = int(np.sum(img_bin) / 255)
-        black = area - white
-        if ((white / area) * 100 > blank_ratio) or ((black / area) * 100 > blank_ratio):
-            continue
-        cnts_list = get_cnts(img_bin, min_cnts_ratio)
-        if len(cnts_list) == 0:
-            continue
-        num_noise, noise_ratio = get_noise(
-            image, canny_thresh1, canny_thresh2, noise_thresh
+        image_list.append(
+            [
+                image,
+                thresh,
+                blank_ratio,
+                min_cnts_ratio,
+                canny_thresh1,
+                canny_thresh2,
+                noise_thresh,
+                noise_ratio_thresh,
+            ]
         )
-        if noise_ratio > noise_ratio_thresh:
-            continue
-        noise_list.append([num_noise, cnts_list])
-    if len(noise_list) > 0:
+    with Pool(3) as p:
+        evaluated = p.map(pool_evaluate_clarity, image_list)
+    noise_list = list(filter(lambda x: x[0] is not None, evaluated))
+    if noise_list is not None:
         noise_list.sort(key=lambda x: x[0])
         sorted_cnts_list = [r[1] for r in noise_list]
         return sorted_cnts_list
     else:
         raise ValueError("No contours were detected.")
+
+
+def pool_evaluate_clarity(args):
+    """Pool function; Evaluate clarity.
+
+    Parameters
+    ----------
+    image : numpy.ndarray
+        Input image.
+    thresh : int, optional
+        Threshold for binarization.
+    blank_ratio : int, optional
+        Ratio of blank.
+    min_cnts_ratio : int, optional
+        Minimum area ratio to detect contours.
+    canny_thresh1 : int, optional
+        Canny threshold 1.
+    canny_thresh2 : int, optional
+        Canny threshold 2.
+    noise_thresh : int, optional
+        Threshold of noise.
+    num_noise_thresh : int, optional
+        THreshold for number of noise.
+
+    Returns
+    -------
+    num_noise : int
+        Number of noise.
+    cnts_list : list
+        List of contours.
+    """
+    num_noise, cnts_list = evaluate_clarity(*args)
+    return num_noise, cnts_list
+
+
+def evaluate_clarity(
+    image,
+    thresh=THRESH,
+    blank_ratio=BLANK_RATIO,
+    min_cnts_ratio=MIN_CNTS_RATIO,
+    canny_thresh1=CANNY_THRESH1,
+    canny_thresh2=CANNY_THRESH2,
+    noise_thresh=NOISE_THRESH,
+    num_noise_thresh=NUM_NOISE_THRESH,
+):
+    """Evalutate clarity.
+
+    Parameters
+    ----------
+    image : numpy.ndarray
+        Input image.
+    thresh : int, optional
+        Threshold for binarization.
+    blank_ratio : int, optional
+        Ratio of blank.
+    min_cnts_ratio : int, optional
+        Minimum area ratio to detect contours.
+    canny_thresh1 : int, optional
+        Canny threshold 1.
+    canny_thresh2 : int, optional
+        Canny threshold 2.
+    noise_thresh : int, optional
+        Threshold of noise.
+    num_noise_thresh : int, optional
+        THreshold for number of noise.
+
+    Returns
+    -------
+    num_noise : int
+        Number of noise.
+    cnts_list : list
+        List of contours.
+    """
+    height, width = image.shape[:2]
+    area = height * width
+    _, img_bin = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)
+    white = int(np.sum(img_bin) / 255)
+    black = area - white
+    if ((white / area) * 100 > blank_ratio) or ((black / area) * 100 > blank_ratio):
+        return None, None
+    cnts_list = get_cnts(img_bin, min_cnts_ratio)
+    if len(cnts_list) == 0:
+        return None, None
+    num_noise, noise_ratio = get_noise(
+        image, canny_thresh1, canny_thresh2, noise_thresh
+    )
+    if noise_ratio > num_noise_thresh:
+        return None, None
+    return num_noise, cnts_list
 
 
 def get_cnts_white_background(

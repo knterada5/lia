@@ -13,8 +13,8 @@ from lia.extract.leaf import (
     LEAF_COLOR_LOWER,
     LEAF_COLOR_UPPER,
     MIN_CNTS_RATIO,
-    NOISE_RATIO_THRESH,
     NOISE_THRESH,
+    NUM_NOISE_THRESH,
     THRESH,
     WHITE_BG_THRESH,
     extract_leaf_by_color,
@@ -65,7 +65,7 @@ class ExtractLeaf(ImageCore):
         self.beyond_error_ellipse = BEYOND_ERROR_ELLIPSE
         self.thresh = THRESH
         self.blank_ratio = BLANK_RATIO
-        self.noise_ratio_thresh = NOISE_RATIO_THRESH
+        self.noise_ratio_thresh = NUM_NOISE_THRESH
         self.canny_thresh1 = CANNY_THRESH1
         self.canny_thresh2 = CANNY_THRESH2
         self.noise_thresh = NOISE_THRESH
@@ -127,7 +127,6 @@ class ExtractLeaf(ImageCore):
         for cnt in leaf_cnt_candidates:
             leaf_img = self.__draw_cnts_area(img, cnt)
             leaf_cnt_imgs.append(leaf_img)
-        # leaf_cnt_imgs = self.__draw_cnts_area(img, leaf_cnt_candidates)
         return leaf_cnt_imgs, leaf_cnt_candidates
 
     def get_by_color(self, input):
