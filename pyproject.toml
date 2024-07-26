@@ -6,7 +6,7 @@ authors = ["knterada5 <knterada5@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.11.6"
+python = "3.11.8"
 opencv-python = "^4.10.0.84"
 numpy = "1.26.4"
 easyocr = "^1.7.1"
