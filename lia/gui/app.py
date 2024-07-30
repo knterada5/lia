@@ -1,4 +1,5 @@
-import os
+import importlib
+import importlib.resources
 
 import flet as ft
 
@@ -33,9 +34,14 @@ class Top(ft.View):
             self.page.views.append(self)
             self.page.update()
         elif self.page.route == COLOR_FVFM_ROUTE:
-            self.page.views.append(ColorFvFmPage(self.page))
+            self.page.views.append(ColorFvFmPage())
             self.page.update()
 
 
 def application(page: ft.Page):
     Top(page)
+
+
+def run():
+    path = importlib.resources.files("lia")
+    ft.app(target=application, assets_dir=str(path) + "/assets")

@@ -2,10 +2,13 @@ import flet as ft
 
 
 class ContentPage(ft.View):
+    """Base Page."""
+
     def __init__(self, **kwargs):
         super().__init__(kwargs)
 
     def click_back_button(self, e):
+        """Back to Top."""
         dialog = ft.AlertDialog(
             title=ft.Text("Please confirm"),
             content=ft.Text(
