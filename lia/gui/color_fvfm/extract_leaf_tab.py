@@ -12,6 +12,7 @@ EXTRACT_LEAF_TITLE = "Extract Leaf"
 DEFAULT_IMAGE_PATH = f"/images/photo.png"
 ARROW_IMAGE_PATH = f"/images/arrow.png"
 METHOD_IMAGE_PATH = f"/images/extract_leaf_method.png"
+METHOD_EXPLANATION = "Detect leaf outlines from an image. And remove background."
 
 
 class ExtractLeafTab(RunTab):
@@ -35,7 +36,8 @@ class ExtractLeafTab(RunTab):
         self.content = ft.Container(
             padding=ft.padding.all(10),
             content=ft.Row(
-                [
+                expand=True,
+                controls=[
                     ft.Container(  # Image container.
                         border=ft.border.all(2, ft.colors.WHITE),
                         expand=1,
@@ -61,7 +63,7 @@ class ExtractLeafTab(RunTab):
                         expand=1,
                         padding=ft.padding.all(10),
                         content=ft.Column(
-                            scroll=ft.ScrollMode.ALWAYS,
+                            expand=1,
                             controls=[
                                 ft.Row(  # Method title
                                     alignment=ft.MainAxisAlignment.CENTER,
@@ -69,60 +71,71 @@ class ExtractLeafTab(RunTab):
                                         ft.Text("Method"),
                                     ],
                                 ),
-                                ft.Row(  # Method image
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                ft.Column(
+                                    expand=1,
+                                    scroll=ft.ScrollMode.ALWAYS,
                                     controls=[
-                                        ft.Image(src=METHOD_IMAGE_PATH, expand=1)
-                                    ],
-                                ),
-                                ft.Text(  # Method explanation
-                                    "Detect leaf outlines from an image. And remove background."
-                                ),
-                                ft.Text("Step 1. Select Image"),
-                                ft.Row(  # Select image button
-                                    alignment=ft.MainAxisAlignment.END,
-                                    controls=[
-                                        ft.TextButton(
-                                            "Select Image",
-                                            icon=ft.icons.INSERT_PHOTO_OUTLINED,
-                                            on_click=self.show_select_file_dialog,
+                                        ft.Row(  # Method image
+                                            alignment=ft.MainAxisAlignment.CENTER,
+                                            controls=[
+                                                ft.Image(
+                                                    src=METHOD_IMAGE_PATH, expand=1
+                                                )
+                                            ],
                                         ),
-                                    ],
-                                ),
-                                ft.Text("Step 2. Set threshold for extract"),
-                                ft.Row(  # Threshold slider
-                                    [
-                                        ft.TextButton(  # Resetbutton
-                                            "Reset", on_click=self.reset_thresh
+                                        ft.Text(  # Method explanation
+                                            METHOD_EXPLANATION
                                         ),
-                                        ft.Container(  # Slider
-                                            expand=1,
-                                            content=self.thresh_slider,
+                                        ft.Divider(height=1, color=ft.colors.WHITE),
+                                        ft.Text("Step 1. Select Image"),
+                                        ft.Row(  # Select image button
+                                            alignment=ft.MainAxisAlignment.END,
+                                            controls=[
+                                                ft.TextButton(
+                                                    "Select Image",
+                                                    icon=ft.icons.INSERT_PHOTO_OUTLINED,
+                                                    on_click=self.show_select_file_dialog,
+                                                ),
+                                            ],
                                         ),
-                                    ]
-                                ),
-                                ft.Text("Step 3. Run"),
-                                ft.Row(  # Run button
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    controls=[
-                                        ft.TextButton(
-                                            "RUN", on_click=self.run, expand=1
+                                        ft.Divider(height=1, color=ft.colors.WHITE),
+                                        ft.Text("Step 2. Set threshold for extract"),
+                                        ft.Row(  # Threshold slider
+                                            [
+                                                ft.TextButton(  # Resetbutton
+                                                    "Reset", on_click=self.reset_thresh
+                                                ),
+                                                ft.Container(  # Slider
+                                                    expand=1,
+                                                    content=self.thresh_slider,
+                                                ),
+                                            ]
                                         ),
-                                    ],
-                                ),
-                                ft.Row(  # Next tab button
-                                    alignment=ft.MainAxisAlignment.END,
-                                    controls=[
-                                        ft.TextButton(
-                                            "Next ->", on_click=self.to_next_tab
-                                        )
+                                        ft.Divider(height=1, color=ft.colors.WHITE),
+                                        ft.Text("Step 3. Run"),
+                                        ft.Row(  # Run button
+                                            alignment=ft.MainAxisAlignment.CENTER,
+                                            controls=[
+                                                ft.TextButton(
+                                                    "RUN", on_click=self.run, expand=1
+                                                ),
+                                            ],
+                                        ),
+                                        ft.Divider(height=1, color=ft.colors.WHITE),
+                                        ft.Row(  # Next tab button
+                                            alignment=ft.MainAxisAlignment.END,
+                                            controls=[
+                                                ft.TextButton(
+                                                    "Next ->", on_click=self.to_next_tab
+                                                )
+                                            ],
+                                        ),
                                     ],
                                 ),
                             ],
                         ),
                     ),
                 ],
-                expand=True,
             ),
         )
 
@@ -155,7 +168,7 @@ class ExtractLeafTab(RunTab):
 
     def run_process(self):
         """Run extract leaf."""
-        self.show_progress_dialog("Extract Leaf", "Running...")
+        self.show_progress_dialog("Extract Leaf contours", "Extracting leaf...")
         thresh = self.thresh_slider.get_value()
         self.extr.set_param(thresh=thresh)
         extr_imgs, extr_cnts = self.extr.get_by_thresh(self.data.input_leaf_path)
