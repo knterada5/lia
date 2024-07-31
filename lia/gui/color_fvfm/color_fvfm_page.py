@@ -72,3 +72,11 @@ class ColorFvFmTabs(ContentTabs):
             self.tab4.reload()
         elif self.selected_index == 5:
             self.tab5.reload()
+
+    def to_next_tab(self):
+        super().to_next_tab()
+        self.change(None)
+
+    def to_previous_tab(self):
+        super().to_previous_tab()
+        self.change(None)

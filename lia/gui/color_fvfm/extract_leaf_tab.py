@@ -75,23 +75,23 @@ class ExtractLeafTab(RunTab):
                                     expand=1,
                                     scroll=ft.ScrollMode.ALWAYS,
                                     controls=[
-                                        ft.Row(  # Method image
-                                            alignment=ft.MainAxisAlignment.CENTER,
-                                            controls=[
-                                                ft.Image(
-                                                    src=METHOD_IMAGE_PATH, expand=1
-                                                )
-                                            ],
-                                        ),
+                                        # ft.Row(  # Method image
+                                        #     alignment=ft.MainAxisAlignment.CENTER,
+                                        #     controls=[
+                                        #         ft.Image(
+                                        #             src=METHOD_IMAGE_PATH, expand=1
+                                        #         )
+                                        #     ],
+                                        # ),
                                         ft.Text(  # Method explanation
                                             METHOD_EXPLANATION
                                         ),
                                         ft.Divider(height=1, color=ft.colors.WHITE),
                                         ft.Text("Step 1. Select Image"),
                                         ft.Row(  # Select image button
-                                            alignment=ft.MainAxisAlignment.END,
+                                            alignment=ft.MainAxisAlignment.CENTER,
                                             controls=[
-                                                ft.TextButton(
+                                                ft.OutlinedButton(
                                                     "Select Image",
                                                     icon=ft.icons.INSERT_PHOTO_OUTLINED,
                                                     on_click=self.show_select_file_dialog,
@@ -116,20 +116,22 @@ class ExtractLeafTab(RunTab):
                                         ft.Row(  # Run button
                                             alignment=ft.MainAxisAlignment.CENTER,
                                             controls=[
-                                                ft.TextButton(
-                                                    "RUN", on_click=self.run, expand=1
+                                                ft.OutlinedButton(
+                                                    "RUN",
+                                                    on_click=self.click_run,
+                                                    # expand=1,
                                                 ),
                                             ],
                                         ),
-                                        ft.Divider(height=1, color=ft.colors.WHITE),
-                                        ft.Row(  # Next tab button
-                                            alignment=ft.MainAxisAlignment.END,
-                                            controls=[
-                                                ft.TextButton(
-                                                    "Next ->", on_click=self.to_next_tab
-                                                )
-                                            ],
-                                        ),
+                                    ],
+                                ),
+                                ft.Divider(height=1, color=ft.colors.WHITE),
+                                ft.Row(  # Next tab button
+                                    alignment=ft.MainAxisAlignment.END,
+                                    controls=[
+                                        ft.TextButton(
+                                            "Next ->", on_click=self.to_next_tab
+                                        )
                                     ],
                                 ),
                             ],
@@ -158,15 +160,15 @@ class ExtractLeafTab(RunTab):
         )
         self.page.update()
 
-    def run(self, e):
+    def click_run(self, e):
         """Running process."""
         if self.data.input_leaf_path is None:
             self.show_error_dialog("No input image. Please select image file.")
             return
-        self.thread = WorkingThread(target=self.run_process)
+        self.thread = WorkingThread(target=self.run)
         self.thread.start()
 
-    def run_process(self):
+    def run(self):
         """Run extract leaf."""
         self.show_progress_dialog("Extract Leaf contours", "Extracting leaf...")
         thresh = self.thresh_slider.get_value()
@@ -174,7 +176,9 @@ class ExtractLeafTab(RunTab):
         extr_imgs, extr_cnts = self.extr.get_by_thresh(self.data.input_leaf_path)
         self.data.extract_leaf_img = extr_imgs[0]
         self.data.leaf_cnts = extr_cnts[0]
-        extr_img_base64 = to_base64(extr_imgs[0])
-        self.output_image_container.set_image(extr_img_base64, "base64")
+        self.data.extract_leaf_img_base64 = to_base64(extr_imgs[0])
+        self.output_image_container.set_image(
+            self.data.extract_leaf_img_base64, "base64"
+        )
         self.page.update()
         self.page.close(self.dialog)

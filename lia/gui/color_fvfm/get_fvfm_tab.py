@@ -98,14 +98,14 @@ class GetFvFmTab(RunTab):
                                     expand=1,
                                     scroll=ft.ScrollMode.ALWAYS,
                                     controls=[
-                                        ft.Row(  # Method Image
-                                            alignment=ft.MainAxisAlignment.CENTER,
-                                            controls=[
-                                                ft.Image(
-                                                    src=METHOD_IMAGE_PATH, expand=1
-                                                )
-                                            ],
-                                        ),
+                                        # ft.Row(  # Method Image
+                                        #     alignment=ft.MainAxisAlignment.CENTER,
+                                        #     controls=[
+                                        #         ft.Image(
+                                        #             src=METHOD_IMAGE_PATH, expand=1
+                                        #         )
+                                        #     ],
+                                        # ),
                                         ft.Text(METHOD_EXPLANATION),
                                         ft.Divider(height=1, color=ft.colors.WHITE),
                                         ft.Text("Step 1. Select Image"),
@@ -136,36 +136,38 @@ class GetFvFmTab(RunTab):
                                         ft.Row(
                                             [
                                                 ft.TextButton(
-                                                    "RUN", expand=1, on_click=self.run
+                                                    "RUN",
+                                                    expand=1,
+                                                    on_click=self.click_run,
                                                 )
                                             ]
                                         ),
-                                        ft.Divider(height=1, color=ft.colors.WHITE),
-                                        ft.Row(
-                                            [
-                                                ft.Row(
-                                                    expand=1,
-                                                    alignment=ft.MainAxisAlignment.START,
-                                                    controls=[
-                                                        ft.TextButton(
-                                                            "<- Back",
-                                                            on_click=self.to_previous_tab,
-                                                        )
-                                                    ],
-                                                ),
-                                                ft.Row(
-                                                    expand=1,
-                                                    alignment=ft.MainAxisAlignment.END,
-                                                    controls=[
-                                                        ft.TextButton(
-                                                            "Next ->",
-                                                            on_click=self.to_next_tab,
-                                                        )
-                                                    ],
-                                                ),
-                                            ]
-                                        ),
                                     ],
+                                ),
+                                ft.Divider(height=1, color=ft.colors.WHITE),
+                                ft.Row(
+                                    [
+                                        ft.Row(
+                                            expand=1,
+                                            alignment=ft.MainAxisAlignment.START,
+                                            controls=[
+                                                ft.TextButton(
+                                                    "<- Back",
+                                                    on_click=self.to_previous_tab,
+                                                )
+                                            ],
+                                        ),
+                                        ft.Row(
+                                            expand=1,
+                                            alignment=ft.MainAxisAlignment.END,
+                                            controls=[
+                                                ft.TextButton(
+                                                    "Next ->",
+                                                    on_click=self.to_next_tab,
+                                                )
+                                            ],
+                                        ),
+                                    ]
                                 ),
                             ],
                         ),
@@ -193,15 +195,15 @@ class GetFvFmTab(RunTab):
         """Reset threshold value."""
         self.thresh_slider.set_value(self.default_thresh)
 
-    def run(self, e):
+    def click_run(self, e):
         """Running process."""
         if self.data.input_fvfm_path is None:
             self.show_error_dialog("No input image. Please select image file.")
             return
-        self.thread = WorkingThread(target=self.run_process)
+        self.thread = WorkingThread(target=self.run)
         self.thread.start()
 
-    def run_process(self):
+    def run(self):
         """Run Extract leaf and Get Fv/Fm value."""
         self.show_progress_dialog("Extract Leaf contours", "Extracting leaf...")
         try:
@@ -210,8 +212,10 @@ class GetFvFmTab(RunTab):
             extr_imgs, extr_cnts = self.extr.get_by_thresh(self.data.input_fvfm_path)
             self.data.extract_leaf_img = extr_imgs[0]
             self.data.fvfm_cnts = extr_cnts[0]
-            extr_leaf_img_base64 = to_base64(extr_imgs[0])
-            self.output_image_container.set_image(extr_leaf_img_base64, "base64")
+            self.data.extract_fvfm_img_base64 = to_base64(extr_imgs[0])
+            self.output_image_container.set_image(
+                self.data.extract_fvfm_img_base64, "base64"
+            )
             self.page.update()
             self.page.close(self.dialog)
             self.show_progress_dialog("Get Fv/Fm value", "Reading Fv/Fm value...")
