@@ -12,6 +12,7 @@ EXTRACT_LEAF_TITLE = "Extract Leaf"
 DEFAULT_IMAGE_PATH = f"/images/photo.png"
 ARROW_IMAGE_PATH = f"/images/arrow.png"
 METHOD_IMAGE_PATH = f"/images/extract_leaf_method.png"
+METHOD_EXPLANATION = "Detect leaf outlines from an image. And remove background."
 
 
 class ExtractLeafTab(RunTab):
@@ -62,7 +63,6 @@ class ExtractLeafTab(RunTab):
                         expand=1,
                         padding=ft.padding.all(10),
                         content=ft.Column(
-                            # scroll=ft.ScrollMode.ALWAYS,
                             expand=1,
                             controls=[
                                 ft.Row(  # Method title
@@ -84,7 +84,7 @@ class ExtractLeafTab(RunTab):
                                             ],
                                         ),
                                         ft.Text(  # Method explanation
-                                            "Detect leaf outlines from an image. And remove background."
+                                            METHOD_EXPLANATION
                                         ),
                                         ft.Divider(height=1, color=ft.colors.WHITE),
                                         ft.Text("Step 1. Select Image"),
@@ -168,7 +168,7 @@ class ExtractLeafTab(RunTab):
 
     def run_process(self):
         """Run extract leaf."""
-        self.show_progress_dialog("Extract Leaf", "Running...")
+        self.show_progress_dialog("Extract Leaf contours", "Extracting leaf...")
         thresh = self.thresh_slider.get_value()
         self.extr.set_param(thresh=thresh)
         extr_imgs, extr_cnts = self.extr.get_by_thresh(self.data.input_leaf_path)

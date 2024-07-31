@@ -7,7 +7,7 @@ from lia import AlignLeaf, ExtractLeaf, GetFvFm, MakeGraph, Pickcell
 
 
 def main():
-    test_extract_leaf()
+    test_get_fvfm()
 
 
 def test_extract_leaf():
