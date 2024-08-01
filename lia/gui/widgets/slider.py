@@ -14,6 +14,7 @@ class BoxSlider(ft.Row):
             input_filter=_filter,
             on_change=self.update_text,
             on_submit=self.submit,
+            border=ft.InputBorder.OUTLINE,
         )
         self.slider = ft.Slider(
             value=value,

@@ -32,6 +32,7 @@ class ExtractLeafTab(RunTab):
         self.input_image_container = ImageContainer(DEFAULT_IMAGE_PATH)
         self.output_image_container = ImageContainer(DEFAULT_IMAGE_PATH)
         self.thresh_slider = BoxSlider(self.thresh, min=0, max=255, divisions=255)
+
         # Layout
         self.content = ft.Container(
             padding=ft.padding.all(10),
@@ -65,24 +66,10 @@ class ExtractLeafTab(RunTab):
                         content=ft.Column(
                             expand=1,
                             controls=[
-                                ft.Row(  # Method title
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    controls=[
-                                        ft.Text("Method"),
-                                    ],
-                                ),
                                 ft.Column(
                                     expand=1,
                                     scroll=ft.ScrollMode.ALWAYS,
                                     controls=[
-                                        # ft.Row(  # Method image
-                                        #     alignment=ft.MainAxisAlignment.CENTER,
-                                        #     controls=[
-                                        #         ft.Image(
-                                        #             src=METHOD_IMAGE_PATH, expand=1
-                                        #         )
-                                        #     ],
-                                        # ),
                                         ft.Text(  # Method explanation
                                             METHOD_EXPLANATION
                                         ),
@@ -95,6 +82,8 @@ class ExtractLeafTab(RunTab):
                                                     "Select Image",
                                                     icon=ft.icons.INSERT_PHOTO_OUTLINED,
                                                     on_click=self.show_select_file_dialog,
+                                                    expand=1,
+                                                    expand_loose=True,
                                                 ),
                                             ],
                                         ),
@@ -102,7 +91,7 @@ class ExtractLeafTab(RunTab):
                                         ft.Text("Step 2. Set threshold for extract"),
                                         ft.Row(  # Threshold slider
                                             [
-                                                ft.TextButton(  # Resetbutton
+                                                ft.OutlinedButton(  # Resetbutton
                                                     "Reset", on_click=self.reset_thresh
                                                 ),
                                                 ft.Container(  # Slider
@@ -119,7 +108,8 @@ class ExtractLeafTab(RunTab):
                                                 ft.OutlinedButton(
                                                     "RUN",
                                                     on_click=self.click_run,
-                                                    # expand=1,
+                                                    expand=1,
+                                                    expand_loose=True,
                                                 ),
                                             ],
                                         ),
@@ -129,8 +119,11 @@ class ExtractLeafTab(RunTab):
                                 ft.Row(  # Next tab button
                                     alignment=ft.MainAxisAlignment.END,
                                     controls=[
-                                        ft.TextButton(
-                                            "Next ->", on_click=self.to_next_tab
+                                        ft.OutlinedButton(
+                                            "Next ->",
+                                            on_click=self.to_next_tab,
+                                            expand=1,
+                                            expand_loose=True,
                                         )
                                     ],
                                 ),
@@ -171,14 +164,18 @@ class ExtractLeafTab(RunTab):
     def run(self):
         """Run extract leaf."""
         self.show_progress_dialog("Extract Leaf contours", "Extracting leaf...")
-        thresh = self.thresh_slider.get_value()
-        self.extr.set_param(thresh=thresh)
-        extr_imgs, extr_cnts = self.extr.get_by_thresh(self.data.input_leaf_path)
-        self.data.extract_leaf_img = extr_imgs[0]
-        self.data.leaf_cnts = extr_cnts[0]
-        self.data.extract_leaf_img_base64 = to_base64(extr_imgs[0])
-        self.output_image_container.set_image(
-            self.data.extract_leaf_img_base64, "base64"
-        )
-        self.page.update()
-        self.page.close(self.dialog)
+        try:
+            thresh = self.thresh_slider.get_value()
+            self.extr.set_param(thresh=thresh)
+            extr_imgs, extr_cnts = self.extr.get_by_thresh(self.data.input_leaf_path)
+            self.data.extract_leaf_img = extr_imgs[0]
+            self.data.leaf_cnts = extr_cnts[0]
+            self.data.extract_leaf_img_base64 = to_base64(extr_imgs[0])
+            self.output_image_container.set_image(
+                self.data.extract_leaf_img_base64, "base64"
+            )
+            self.page.update()
+            self.page.close(self.dialog)
+        except Exception as e:
+            self.page.close(self.dialog)
+            self.show_error_dialog(str(e))
