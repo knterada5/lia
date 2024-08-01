@@ -2,6 +2,8 @@ import flet as ft
 
 
 class ImageContainer(ft.Row):
+    """Image container."""
+
     def __init__(self, default_img):
         super().__init__()
         self.expand = True
@@ -10,6 +12,15 @@ class ImageContainer(ft.Row):
         self.controls = [self.image]
 
     def set_image(self, input, input_type):
+        """Set Image.
+
+        Parameters
+        ----------
+        input : str
+            Input image path.
+        input_type : str
+            Input image by base64 format.
+        """
         if input is None:
             return
         if input_type == "path":
