@@ -8,7 +8,7 @@ from lia.data.color_fvfm import ColorFvFmData
 from lia.gui.base.run_tab import RunTab
 from lia.gui.widgets.image_container import ImageContainer
 from lia.gui.widgets.image_listview import ImageListView
-from lia.gui.widgets.slider import BoxSlider
+from lia.gui.widgets.slider import BoxIntSlider
 
 GET_FVFM_TITLE = "Get Fv/Fm value"
 DEFAULT_IMAGE_PATH = f"/images/photo.png"
@@ -35,7 +35,7 @@ class GetFvFmTab(RunTab):
         self.input_image_container = ImageContainer(DEFAULT_IMAGE_PATH)
         self.output_image_container = ImageContainer(DEFAULT_IMAGE_PATH)
         self.list_view = ImageListView(expand=1, spacing=10)
-        self.thresh_slider = BoxSlider(self.thresh, max=255, min=0, divisions=255)
+        self.thresh_slider = BoxIntSlider(self.thresh, max=255, min=0, divisions=255)
 
         # Layout
         self.content = ft.Container(

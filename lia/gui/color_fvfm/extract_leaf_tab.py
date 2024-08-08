@@ -6,7 +6,7 @@ from lia.basic.transform.image import to_base64
 from lia.data.color_fvfm import ColorFvFmData
 from lia.gui.base.run_tab import RunTab
 from lia.gui.widgets.image_container import ImageContainer
-from lia.gui.widgets.slider import BoxSlider
+from lia.gui.widgets.slider import BoxIntSlider
 
 EXTRACT_LEAF_TITLE = "Extract Leaf"
 DEFAULT_IMAGE_PATH = f"/images/photo.png"
@@ -31,7 +31,7 @@ class ExtractLeafTab(RunTab):
         """Set controls."""
         self.input_image_container = ImageContainer(DEFAULT_IMAGE_PATH)
         self.output_image_container = ImageContainer(DEFAULT_IMAGE_PATH)
-        self.thresh_slider = BoxSlider(self.thresh, min=0, max=255, divisions=255)
+        self.thresh_slider = BoxIntSlider(self.thresh, min=0, max=255, divisions=255)
 
         # Layout
         self.content = ft.Container(

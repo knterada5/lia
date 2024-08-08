@@ -10,7 +10,6 @@ from lia.gui.widgets.image_container import ImageContainer
 
 ALIGN_TITLE = "Align"
 DEFAULT_IMAGE_PATH = "/images/photo.png"
-METHOD_IMAGE_PATH = "/images/align_method.png"
 METHOD_EXPLANATION = "Adjust the size and tilt so that the two images overlap exactly."
 RIGHT_ARROW = "/images/arrow_right.png"
 
@@ -32,6 +31,8 @@ class AlignTab(RunTab):
         self.aligned_leaf_img = ImageContainer(DEFAULT_IMAGE_PATH)
         self.aligned_fvfm_img = ImageContainer(DEFAULT_IMAGE_PATH)
         self.overlay_img = ImageContainer(DEFAULT_IMAGE_PATH)
+
+        # Layout
         self.content = ft.Container(
             padding=ft.padding.all(10),
             content=ft.Row(
